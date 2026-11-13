@@ -242,7 +242,7 @@ values_for() {
 # into its charts/ directory, which a checkout does not carry. helm dependency
 # build refuses to run until every repository in Chart.yaml has been added, so
 # they are added to a throwaway Helm config, leaving the caller's repository
-# list alone. OCI dependencies need no repository entry. Local file dependencies also need no repository. A chart without a Chart.lock has nothing to build.
+# list alone. OCI dependencies need no repository entry. A chart without a Chart.lock has nothing to build.
 build_chart_dependencies() {
   local chart="$1" helm_home url n=0
   [[ -f "${chart}/Chart.lock" ]] || return 0
@@ -251,7 +251,7 @@ build_chart_dependencies() {
     HELM_REPOSITORY_CACHE="${helm_home}/cache")
   log "building chart dependencies of ${chart}"
   while IFS= read -r url; do
-    [[ "${url}" == oci://* || "${url}" == file://* ]] && continue
+    [[ "${url}" == oci://* ]] && continue
     n=$((n + 1))
     run "${helm_env[@]}" helm repo add "dependency-${n}" "${url}"
   done < <(awk '$1 == "repository:" { print $2 }' "${chart}/Chart.yaml" | sort -u)
